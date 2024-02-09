@@ -1,4 +1,4 @@
-package com.example.kinopoisk.ui.theme
+package com.example.kinopoisk.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
