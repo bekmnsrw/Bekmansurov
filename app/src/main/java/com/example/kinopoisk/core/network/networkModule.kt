@@ -1,13 +1,13 @@
 package com.example.kinopoisk.core.network
 
-import com.example.kinopoisk.core.network.Qualifier.*
+import com.example.kinopoisk.core.network.Qualifier.API_KEY_INTERCEPTOR
+import com.example.kinopoisk.core.network.Qualifier.LOGGING_INTERCEPTOR
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.android.BuildConfig
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Converter
@@ -69,10 +69,7 @@ private fun provideRetrofit(
     .build()
 
 private fun provideLoggingInterceptor(): Interceptor = HttpLoggingInterceptor().apply {
-    level = when (BuildConfig.DEBUG) {
-        true -> HttpLoggingInterceptor.Level.BODY
-        false -> HttpLoggingInterceptor.Level.NONE
-    }
+    level = HttpLoggingInterceptor.Level.BODY
 }
 
 private val json = Json { ignoreUnknownKeys = true }

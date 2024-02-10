@@ -2,6 +2,7 @@ package com.example.kinopoisk.app
 
 import android.app.Application
 import com.example.kinopoisk.core.network.networkModule
+import com.example.kinopoisk.feature.details.detailsModule
 import com.example.kinopoisk.feature.popular.popularModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -17,7 +18,8 @@ class App : Application() {
             androidContext(this@App)
             modules(
                 networkModule,
-                popularModule
+                popularModule,
+                detailsModule
             )
         }
     }

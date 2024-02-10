@@ -1,5 +1,6 @@
 package com.example.kinopoisk.core.network
 
+import com.example.kinopoisk.feature.details.data.response.FilmDetailsResponse
 import com.example.kinopoisk.feature.popular.data.response.Top100FilmsResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -16,8 +17,8 @@ interface KinopoiskApi {
         @Query(value = "type") type: String = TYPE
     ): Top100FilmsResponse
 
-    @GET(value = "v2.2/films/top/{film-id}")
-    suspend fun getFilmDescription(
+    @GET(value = "v2.2/films/{film-id}")
+    suspend fun getFilmDetails(
         @Path(value = "film-id") filmId: Int
-    )
+    ): FilmDetailsResponse
 }

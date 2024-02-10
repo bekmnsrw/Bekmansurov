@@ -4,6 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Country(
-    @SerialName("country") val country: String
+data class GenreResponse(
+    @SerialName("genre") val genre: String
 )

@@ -5,14 +5,15 @@ import com.example.kinopoisk.feature.popular.data.PopularRepositoryImpl
 import com.example.kinopoisk.feature.popular.domain.PopularRepository
 import com.example.kinopoisk.feature.popular.domain.usecase.GetTop100FilmsUseCase
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val popularModule = module {
-    factory<PopularRepository> {
+    single<PopularRepository> {
         providePopularRepository(kinopoiskApi = get())
     }
 
-    factory<PopularViewModel> {
+    viewModel {
         providePopularViewModel(getTop100FilmsUseCase = get())
     }
 

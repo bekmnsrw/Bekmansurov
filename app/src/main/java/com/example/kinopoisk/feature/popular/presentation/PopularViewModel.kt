@@ -5,10 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kinopoisk.feature.popular.domain.dto.FilmBrief
 import com.example.kinopoisk.feature.popular.domain.usecase.GetTop100FilmsUseCase
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.*
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.*
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -40,11 +43,13 @@ class PopularViewModel(
     @Immutable
     sealed interface PopularScreenEvent {
         data object OnInit : PopularScreenEvent
+        data class OnFilmCardClick(val filmId: Int) : PopularScreenEvent
     }
 
     @Immutable
     sealed interface PopularScreenAction {
         data class ShowSnackbar(val message: String) : PopularScreenAction
+        data class NavigateDetails(val filmId: Int) : PopularScreenAction
     }
 
     init {
@@ -54,11 +59,13 @@ class PopularViewModel(
     fun eventHandler(event: PopularScreenEvent) {
         when (event) {
             OnInit -> onInit()
+            is OnFilmCardClick -> onFilmCardClick(event.filmId)
         }
     }
 
     private fun onInit() = viewModelScope.launch {
         getTop100FilmsUseCase()
+            .flowOn(Dispatchers.IO)
             .onStart {
                 _screenState.emit(
                     _screenState.value.copy(
@@ -83,5 +90,11 @@ class PopularViewModel(
                     )
                 )
             }
+    }
+
+    private fun onFilmCardClick(filmId: Int) = viewModelScope.launch {
+        _screenAction.emit(
+            NavigateDetails(filmId = filmId)
+        )
     }
 }

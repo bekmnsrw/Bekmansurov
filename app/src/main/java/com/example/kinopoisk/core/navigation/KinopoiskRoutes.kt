@@ -5,3 +5,6 @@ const val POPULAR_GRAPH_ROUTE = "popular_graph"
 
 const val FAVORITES_SCREEN_ROUTE = "favorites"
 const val FAVORITES_GRAPH_ROUTE = "favorites_graph"
+
+const val DETAILS_FROM_POPULAR = "popular_details"
+const val DETAILS_FROM_FAVORITES = "favorites_details"

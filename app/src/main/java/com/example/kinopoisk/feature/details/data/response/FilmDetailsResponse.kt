@@ -1,0 +1,53 @@
+package com.example.kinopoisk.feature.details.data.response
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class FilmDetailsResponse(
+    @SerialName("kinopoiskId") val kinopoiskId: Int,
+    @SerialName("nameRu") val nameRu: String,
+    @SerialName("description") val description: String,
+    @SerialName("genres") val genres: List<GenreResponse>,
+    @SerialName("countries") val countries: List<CountryResponse>,
+    @SerialName("posterUrl") val posterUrl: String,
+    @SerialName("completed") val completed: Boolean?,
+    @SerialName("filmLength") val filmLength: Int?,
+    @SerialName("has3D") val has3D: Boolean?,
+    @SerialName("hasImax") val hasImax: Boolean?,
+    @SerialName("imdbId") val imdbId: String?,
+    @SerialName("isTicketsAvailable") val isTicketsAvailable: Boolean?,
+    @SerialName("lastSync") val lastSync: String?,
+    @SerialName("posterUrlPreview") val posterUrlPreview: String?,
+    @SerialName("productionStatus") val productionStatus: String?,
+    @SerialName("ratingAgeLimits") val ratingAgeLimits: String?,
+    @SerialName("ratingAwait") val ratingAwait: Double?,
+    @SerialName("ratingAwaitCount") val ratingAwaitCount: Int?,
+    @SerialName("ratingFilmCriticsVoteCount") val ratingFilmCriticsVoteCount: Int?,
+    @SerialName("ratingGoodReviewVoteCount") val ratingGoodReviewVoteCount: Int?,
+    @SerialName("ratingImdbVoteCount") val ratingImdbVoteCount: Int?,
+    @SerialName("ratingKinopoiskVoteCount") val ratingKinopoiskVoteCount: Int?,
+    @SerialName("ratingRfCriticsVoteCount") val ratingRfCriticsVoteCount: Int?,
+    @SerialName("reviewsCount") val reviewsCount: Int?,
+    @SerialName("serial") val serial: Boolean?,
+    @SerialName("shortFilm") val shortFilm: Boolean?,
+    @SerialName("type") val type: String?,
+    @SerialName("webUrl") val webUrl: String?,
+    @SerialName("year") val year: Int?,
+    @SerialName("startYear") val startYear: Int?,
+    @SerialName("endYear") val endYear: Int?,
+    @SerialName("nameEn") val nameEn: String?,
+    @SerialName("coverUrl") val coverUrl: String?,
+    @SerialName("kinopoiskHDId") val kinopoiskHDId: String?,
+    @SerialName("logoUrl") val logoUrl: String?,
+    @SerialName("nameOriginal") val nameOriginal: String?,
+    @SerialName("shortDescription") val shortDescription: String?,
+    @SerialName("slogan") val slogan: String?,
+    @SerialName("ratingMpaa") val ratingMpaa: String?,
+    @SerialName("ratingFilmCritics") val ratingFilmCritics: Double?,
+    @SerialName("editorAnnotation") val editorAnnotation: String?,
+    @SerialName("ratingRfCritics") val ratingRfCritics: Double?,
+    @SerialName("ratingGoodReview") val ratingGoodReview: Double?,
+    @SerialName("ratingImdb") val ratingImdb: Double?,
+    @SerialName("ratingKinopoisk") val ratingKinopoisk: Double?
+)

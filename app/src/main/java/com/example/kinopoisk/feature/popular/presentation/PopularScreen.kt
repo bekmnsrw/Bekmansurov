@@ -20,33 +20,36 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.kinopoisk.core.designsystem.theme.KinopoiskColor
 import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
+import com.example.kinopoisk.core.navigation.NestedScreen.FilmDetails
 import com.example.kinopoisk.core.navigation.navgraph.NavigationGraph
 import com.example.kinopoisk.core.widget.KinopoiskCircularBar
 import com.example.kinopoisk.core.widget.KinopoiskFilmCard
 import com.example.kinopoisk.core.widget.KinopoiskTopBar
 import com.example.kinopoisk.feature.popular.domain.dto.FilmBrief
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.*
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.NavigateDetails
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.ShowSnackbar
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnFilmCardClick
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenState
 import kotlinx.collections.immutable.PersistentList
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun PopularScreen(
-    navController: NavController,
-    viewModel: PopularViewModel = koinViewModel()
-) {
+fun PopularScreen(navController: NavController) {
+    val viewModel = koinViewModel<PopularViewModel>()
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val screenAction by viewModel.screenAction.collectAsStateWithLifecycle(initialValue = null)
 
     PopularScreenContent(
-        screenState = screenState
+        screenState = screenState,
+        eventHandler = viewModel::eventHandler
     )
 
     PopularScreenActions(
-        screenAction = screenAction
+        screenAction = screenAction,
+        navController = navController
     )
 }
 
@@ -54,7 +57,8 @@ fun PopularScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PopularScreenContent(
-    screenState: PopularScreenState
+    screenState: PopularScreenState,
+    eventHandler: (PopularScreenEvent) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(state = rememberTopAppBarState())
 
@@ -73,7 +77,8 @@ private fun PopularScreenContent(
             true -> KinopoiskCircularBar(shouldShow = true)
             false -> Top100FilmsList(
                 contentPadding = contentPadding,
-                top100Films = screenState.top100Films
+                top100Films = screenState.top100Films,
+                onClick = { filmId -> eventHandler(OnFilmCardClick(filmId = filmId)) }
             )
         }
     }
@@ -82,7 +87,8 @@ private fun PopularScreenContent(
 @Composable
 private fun Top100FilmsList(
     contentPadding: PaddingValues,
-    top100Films: PersistentList<FilmBrief>
+    top100Films: PersistentList<FilmBrief>,
+    onClick: (Int) -> Unit
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(space = 12.dp),
@@ -96,10 +102,10 @@ private fun Top100FilmsList(
             items = top100Films,
             key = { it.filmId },
             contentType = { "Top100Films" }
-        ) {
+        ) { filmBrief ->
             KinopoiskFilmCard(
-                filmBrief = it,
-                onClick = {},
+                filmBrief = filmBrief,
+                onClick = { onClick(filmBrief.filmId) },
                 onLongPress = {}
             )
         }
@@ -108,12 +114,20 @@ private fun Top100FilmsList(
 
 @Composable
 private fun PopularScreenActions(
-    screenAction: PopularScreenAction?
+    screenAction: PopularScreenAction?,
+    navController: NavController
 ) {
     LaunchedEffect(screenAction) {
         when (screenAction) {
             null -> Unit
+
             is ShowSnackbar -> {}
+
+            is NavigateDetails -> navController.navigate(
+                FilmDetails.fromPopularScreen(
+                    filmId = screenAction.filmId
+                )
+            )
         }
     }
 }
