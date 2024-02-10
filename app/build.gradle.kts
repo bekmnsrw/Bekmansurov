@@ -109,5 +109,6 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.datetime)
     implementation(libs.system.ui.controller)
+    implementation(libs.androidx.lifecycle.compose)
     // End Region
 }

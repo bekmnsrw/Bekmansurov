@@ -7,7 +7,8 @@ fun FilmBriefResponse.toFilmBrief(): FilmBrief = FilmBrief(
     filmId = filmId,
     nameRu = nameRu,
     posterUrlPreview = posterUrlPreview,
-    year = year
+    year = year,
+    genre = genres.first().genre.replaceFirstChar { it.uppercase() }
 )
 
 fun List<FilmBriefResponse>.toFilmBriefList(): List<FilmBrief> = this.map { it.toFilmBrief() }

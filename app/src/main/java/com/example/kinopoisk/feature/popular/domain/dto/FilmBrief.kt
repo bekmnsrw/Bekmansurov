@@ -4,5 +4,6 @@ data class FilmBrief(
     val filmId: Int,
     val nameRu: String,
     val posterUrlPreview: String,
-    val year: Int
+    val year: Int,
+    val genre: String
 )
