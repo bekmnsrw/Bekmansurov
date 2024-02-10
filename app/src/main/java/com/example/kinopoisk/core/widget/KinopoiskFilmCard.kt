@@ -34,7 +34,7 @@ fun KinopoiskFilmCard(
             .wrapContentHeight(),
         shape = RoundedCornerShape(size = 16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = KinopoiskTheme.kinopoiskColor.white)
+        colors = CardDefaults.cardColors(containerColor = KinopoiskTheme.kinopoiskColor.surface)
     ) {
         Row(
             modifier = Modifier
@@ -69,7 +69,7 @@ private fun KinopoiskCardTitle(text: String) {
     Text(
         text = text,
         style = KinopoiskTheme.kinopoiskTypography.cardTitle,
-        color = KinopoiskTheme.kinopoiskColor.black,
+        color = KinopoiskTheme.kinopoiskColor.primaryText,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
@@ -83,7 +83,7 @@ private fun KinopoiskCardSupportingText(
     Text(
         text = "$genre ($year)",
         style = KinopoiskTheme.kinopoiskTypography.cardSupportingText,
-        color = KinopoiskTheme.kinopoiskColor.grey,
+        color = KinopoiskTheme.kinopoiskColor.secondaryText,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )

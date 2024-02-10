@@ -1,6 +1,7 @@
 package com.example.kinopoisk.feature.popular.presentation
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.kinopoisk.core.designsystem.theme.KinopoiskColor
+import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
 import com.example.kinopoisk.core.navigation.navgraph.NavigationGraph
 import com.example.kinopoisk.core.widget.KinopoiskCircularBar
 import com.example.kinopoisk.core.widget.KinopoiskFilmCard
@@ -87,6 +90,7 @@ private fun Top100FilmsList(
         modifier = Modifier
             .fillMaxSize()
             .padding(contentPadding)
+            .background(KinopoiskTheme.kinopoiskColor.background)
     ) {
         items(
             items = top100Films,

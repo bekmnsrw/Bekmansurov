@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
 import com.example.kinopoisk.core.navigation.navgraph.NavigationGraph
 import com.example.kinopoisk.core.navigation.navgraph.popularNavGraph
 
@@ -23,10 +24,10 @@ fun NavigationHost(navController: NavHostController = rememberNavController()) {
                 navController = navController,
                 bottomAppBarItems = bottomAppBarItems
             )
-        }
-    ) { contentPadding ->
+        },
+        containerColor = KinopoiskTheme.kinopoiskColor.background
+    ) { _ ->
         NavHost(
-//            modifier = Modifier.padding(contentPadding),
             navController = navController,
             startDestination = NavigationGraph.PopularNavGraph.route
         ) {

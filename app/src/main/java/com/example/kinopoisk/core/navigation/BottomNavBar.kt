@@ -41,12 +41,12 @@ fun BottomNavBar(
                         modifier = Modifier.weight(1f),
                         text = bottomAppBarItem.text,
                         containerColor = when (isSelected) {
-                            true -> KinopoiskTheme.kinopoiskColor.blue
-                            false -> KinopoiskTheme.kinopoiskColor.lightBlue
+                            true -> KinopoiskTheme.kinopoiskColor.primary
+                            false -> KinopoiskTheme.kinopoiskColor.secondary
                         },
                         contentColor = when (isSelected) {
-                            true -> KinopoiskTheme.kinopoiskColor.white
-                            false -> KinopoiskTheme.kinopoiskColor.blue
+                            true -> KinopoiskTheme.kinopoiskColor.onPrimary
+                            false -> KinopoiskTheme.kinopoiskColor.onSecondary
                         }
                     ) {
 //                    navController.navigate(bottomAppBarItem.route) {

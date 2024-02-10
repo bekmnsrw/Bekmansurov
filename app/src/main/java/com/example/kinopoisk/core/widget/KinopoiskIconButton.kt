@@ -20,7 +20,7 @@ fun KinopoiskIconButton(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = KinopoiskTheme.kinopoiskColor.blue
+            tint = KinopoiskTheme.kinopoiskColor.primary
         )
     }
 }
