@@ -8,6 +8,7 @@ import com.example.kinopoisk.feature.details.domain.dto.FilmDetails
 import com.example.kinopoisk.feature.details.domain.usecase.GetFilmDetailsUseCase
 import com.example.kinopoisk.feature.details.presentation.DetailsViewModel.DetailsScreenAction.*
 import com.example.kinopoisk.feature.details.presentation.DetailsViewModel.DetailsScreenEvent.*
+import com.example.kinopoisk.utils.ErrorType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 
 class DetailsViewModel(
     savedStateHandle: SavedStateHandle,
@@ -42,13 +44,14 @@ class DetailsViewModel(
     data class DetailsScreenState(
         val isLoading: Boolean = false,
         val filmDetails: FilmDetails? = null,
-        val error: Throwable? = null
+        val error: ErrorType? = null
     )
 
     @Immutable
     sealed interface DetailsScreenEvent {
         data object OnInit : DetailsScreenEvent
         data object OnArrowBackClick : DetailsScreenEvent
+        data object OnRetryButtonClick : DetailsScreenEvent
     }
 
     @Immutable
@@ -64,6 +67,7 @@ class DetailsViewModel(
         when (event) {
             OnInit -> onInit()
             OnArrowBackClick -> onArrowBackClick()
+            OnRetryButtonClick -> onRetryButtonClick()
         }
     }
 
@@ -85,11 +89,25 @@ class DetailsViewModel(
                 )
             }
             .catch {
+                when (it) {
+                    is UnknownHostException -> _screenState.emit(
+                        _screenState.value.copy(
+                            error = ErrorType.NO_INTERNET_CONNECTION
+                        )
+                    )
+                    else -> _screenState.emit(
+                        _screenState.value.copy(
+                            error = ErrorType.OTHER
+                        )
+                    )
+                }
+                println(it)
             }
             .collect { filmDetails ->
                 _screenState.emit(
                     _screenState.value.copy(
-                        filmDetails = filmDetails
+                        filmDetails = filmDetails,
+                        error = null
                     )
                 )
             }
@@ -99,5 +117,48 @@ class DetailsViewModel(
         _screenAction.emit(
             NavigateUp
         )
+    }
+
+    private fun onRetryButtonClick() = viewModelScope.launch {
+        getFilmDetailsUseCase(filmId = filmId)
+            .flowOn(Dispatchers.IO)
+            .onStart {
+                _screenState.emit(
+                    _screenState.value.copy(
+                        error = null,
+                        isLoading = true
+                    )
+                )
+            }
+            .onCompletion {
+                _screenState.emit(
+                    _screenState.value.copy(
+                        isLoading = false
+                    )
+                )
+            }
+            .catch {
+                when (it) {
+                    is UnknownHostException -> _screenState.emit(
+                        _screenState.value.copy(
+                            error = ErrorType.NO_INTERNET_CONNECTION
+                        )
+                    )
+                    else -> _screenState.emit(
+                        _screenState.value.copy(
+                            error = ErrorType.OTHER
+                        )
+                    )
+                }
+                println(it)
+            }
+            .collect { filmDetails ->
+                _screenState.emit(
+                    _screenState.value.copy(
+                        filmDetails = filmDetails,
+                        error = null
+                    )
+                )
+            }
     }
 }

@@ -24,14 +24,14 @@ import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
 import com.example.kinopoisk.core.navigation.NestedScreen.FilmDetails
 import com.example.kinopoisk.core.navigation.navgraph.NavigationGraph
 import com.example.kinopoisk.core.widget.KinopoiskCircularBar
+import com.example.kinopoisk.core.widget.KinopoiskErrorMessage
 import com.example.kinopoisk.core.widget.KinopoiskFilmCard
 import com.example.kinopoisk.core.widget.KinopoiskTopBar
 import com.example.kinopoisk.feature.popular.domain.dto.FilmBrief
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.NavigateDetails
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.ShowSnackbar
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnFilmCardClick
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.*
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenState
 import kotlinx.collections.immutable.PersistentList
 import org.koin.androidx.compose.koinViewModel
@@ -60,7 +60,10 @@ private fun PopularScreenContent(
     screenState: PopularScreenState,
     eventHandler: (PopularScreenEvent) -> Unit
 ) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(state = rememberTopAppBarState())
+    val scrollBehavior = when (screenState.error) {
+        null -> TopAppBarDefaults.enterAlwaysScrollBehavior(state = rememberTopAppBarState())
+        else -> TopAppBarDefaults.pinnedScrollBehavior(state = rememberTopAppBarState())
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(connection = scrollBehavior.nestedScrollConnection),
@@ -80,6 +83,12 @@ private fun PopularScreenContent(
                 top100Films = screenState.top100Films,
                 onClick = { filmId -> eventHandler(OnFilmCardClick(filmId = filmId)) }
             )
+        }
+
+        if (screenState.error != null) {
+            KinopoiskErrorMessage(errorType = screenState.error) {
+                eventHandler(OnRetryButtonClick)
+            }
         }
     }
 }
@@ -120,8 +129,6 @@ private fun PopularScreenActions(
     LaunchedEffect(screenAction) {
         when (screenAction) {
             null -> Unit
-
-            is ShowSnackbar -> {}
 
             is NavigateDetails -> navController.navigate(
                 FilmDetails.fromPopularScreen(

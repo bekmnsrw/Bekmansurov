@@ -26,6 +26,7 @@ import com.example.kinopoisk.R
 import com.example.kinopoisk.core.designsystem.icon.KinopoiskIcons
 import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
 import com.example.kinopoisk.core.widget.KinopoiskCircularBar
+import com.example.kinopoisk.core.widget.KinopoiskErrorMessage
 import com.example.kinopoisk.core.widget.KinopoiskIconButton
 import com.example.kinopoisk.core.widget.KinopoiskImage
 import com.example.kinopoisk.feature.details.domain.dto.FilmDetails
@@ -33,6 +34,7 @@ import com.example.kinopoisk.feature.details.presentation.DetailsViewModel.Detai
 import com.example.kinopoisk.feature.details.presentation.DetailsViewModel.DetailsScreenAction.NavigateUp
 import com.example.kinopoisk.feature.details.presentation.DetailsViewModel.DetailsScreenEvent
 import com.example.kinopoisk.feature.details.presentation.DetailsViewModel.DetailsScreenEvent.OnArrowBackClick
+import com.example.kinopoisk.feature.details.presentation.DetailsViewModel.DetailsScreenEvent.OnRetryButtonClick
 import com.example.kinopoisk.feature.details.presentation.DetailsViewModel.DetailsScreenState
 import org.koin.androidx.compose.koinViewModel
 
@@ -67,6 +69,12 @@ private fun DetailsScreenContent(
                     filmDetails = screenState.filmDetails,
                     onArrowBackClick = { eventHandler(OnArrowBackClick) }
                 )
+            }
+        }
+
+        if (screenState.error != null) {
+            KinopoiskErrorMessage(errorType = screenState.error) {
+                eventHandler(OnRetryButtonClick)
             }
         }
     }
