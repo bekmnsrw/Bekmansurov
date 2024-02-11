@@ -1,6 +1,7 @@
 package com.example.kinopoisk.utils
 
 enum class ErrorType {
-    NO_INTERNET_CONNECTION,
-    OTHER
+    UNKNOWN_HOST_EXCEPTION,
+    OTHER,
+    NO_DATA_IN_DB
 }

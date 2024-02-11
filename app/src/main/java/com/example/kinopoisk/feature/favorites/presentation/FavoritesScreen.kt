@@ -1,6 +1,6 @@
-package com.example.kinopoisk.feature.popular.presentation
+package com.example.kinopoisk.feature.favorites.presentation
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,49 +33,49 @@ import com.example.kinopoisk.core.widget.KinopoiskFilmCard
 import com.example.kinopoisk.core.widget.KinopoiskProgressBar
 import com.example.kinopoisk.core.widget.KinopoiskSnackbar
 import com.example.kinopoisk.core.widget.KinopoiskTopBar
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenAction
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenAction.NavigateDetails
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenAction.NavigateSearchScreen
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenAction.ShowSnackbar
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenEvent
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenEvent.OnConfirmDialog
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenEvent.OnDialogDismissRequest
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenEvent.OnFilmCardClick
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenEvent.OnFilmCardPress
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenEvent.OnRetryButtonClick
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenEvent.OnSearchIconClick
+import com.example.kinopoisk.feature.favorites.presentation.FavoritesViewModel.FavoritesScreenState
 import com.example.kinopoisk.feature.popular.domain.dto.FilmBrief
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.NavigateDetails
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.NavigateSearchScreen
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.ShowSnackbar
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnConfirmDialog
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnDialogDismissRequest
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnFilmCardClick
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnFilmCardPress
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnRetryButtonClick
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnSearchIconClick
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenState
+import com.example.kinopoisk.utils.ErrorType
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun PopularScreen(navController: NavController) {
-    val viewModel = koinViewModel<PopularViewModel>()
+fun FavoritesScreen(navController: NavController) {
+    val viewModel = koinViewModel<FavoritesViewModel>()
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val screenAction by viewModel.screenAction.collectAsStateWithLifecycle(initialValue = null)
     val snackbarHostState = remember { SnackbarHostState() }
 
-    PopularScreenContent(
+    FavoritesScreenContent(
         screenState = screenState,
         eventHandler = viewModel::eventHandler,
         snackbarHostState = snackbarHostState
     )
 
-    PopularScreenActions(
-        screenAction = screenAction,
+    FavoritesScreenActions(
         navController = navController,
+        screenAction = screenAction,
         snackbarHostState = snackbarHostState
     )
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PopularScreenContent(
-    screenState: PopularScreenState,
-    eventHandler: (PopularScreenEvent) -> Unit,
+private fun FavoritesScreenContent(
+    screenState: FavoritesScreenState,
+    eventHandler: (FavoritesScreenEvent) -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
     val scrollBehavior = when (screenState.error) {
@@ -91,19 +91,25 @@ private fun PopularScreenContent(
         topBar = {
             KinopoiskTopBar(
                 scrollBehavior = scrollBehavior,
-                title = NavigationGraph.PopularNavGraph.name,
+                title = NavigationGraph.FavoritesNavGraph.name,
                 onClick = { eventHandler(OnSearchIconClick) }
             )
         }
     ) { contentPadding ->
         when (screenState.isLoading) {
             true -> KinopoiskProgressBar(shouldShow = true)
-            false -> Top100FilmsList(
-                contentPadding = contentPadding,
-                top100Films = screenState.top100Films,
-                onClick = { eventHandler(OnFilmCardClick(filmId = it)) },
-                onPress = { eventHandler(OnFilmCardPress(filmBrief = it)) }
-            )
+            false -> {
+                if (screenState.favoriteFilms.isEmpty()) {
+                    KinopoiskErrorMessage(errorType = ErrorType.NO_DATA_IN_DB)
+                } else {
+                    FavoriteFilms(
+                        contentPadding = contentPadding,
+                        favoriteFilms = screenState.favoriteFilms,
+                        onClick = { eventHandler(OnFilmCardClick(kinopoiskId = it)) },
+                        onPress = { eventHandler(OnFilmCardPress(filmBrief = it)) }
+                    )
+                }
+            }
         }
 
         if (screenState.error != null) {
@@ -115,7 +121,7 @@ private fun PopularScreenContent(
         if (screenState.shouldShowDialog) {
             screenState.selectedFilm?.let { selectedFilm ->
                 KinopoiskConfirmDialog(
-                    title = "Добавить \"${selectedFilm.nameRu}\" в избранное?",
+                    title = "Удалить \"${selectedFilm.nameRu}\" из избранного?",
                     onDismissRequest = { eventHandler(OnDialogDismissRequest) },
                     onConfirmButtonClick = { eventHandler(OnConfirmDialog(selectedFilm)) }
                 )
@@ -124,10 +130,11 @@ private fun PopularScreenContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Top100FilmsList(
+private fun FavoriteFilms(
     contentPadding: PaddingValues,
-    top100Films: PersistentList<FilmBrief>,
+    favoriteFilms: PersistentList<FilmBrief>,
     onClick: (Int) -> Unit,
     onPress: (FilmBrief) -> Unit
 ) {
@@ -140,12 +147,13 @@ private fun Top100FilmsList(
             .background(KinopoiskTheme.kinopoiskColor.background)
     ) {
         items(
-            items = top100Films,
+            items = favoriteFilms,
             key = { it.filmId },
             contentType = { "Top100Films" }
         ) { filmBrief ->
             KinopoiskFilmCard(
-                isFavorite = false,
+                modifier = Modifier.animateItemPlacement(),
+                isFavorite = true,
                 filmBrief = filmBrief,
                 onClick = { onClick(filmBrief.filmId) },
                 onPress = { onPress(filmBrief) }
@@ -155,9 +163,9 @@ private fun Top100FilmsList(
 }
 
 @Composable
-private fun PopularScreenActions(
-    screenAction: PopularScreenAction?,
+private fun FavoritesScreenActions(
     navController: NavController,
+    screenAction: FavoritesScreenAction?,
     snackbarHostState: SnackbarHostState
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -167,15 +175,9 @@ private fun PopularScreenActions(
             null -> Unit
 
             is NavigateDetails -> navController.navigate(
-                NestedScreen.FilmDetails.fromPopularScreen(
-                    filmId = screenAction.filmId,
-                    source = "POPULAR"
-                )
-            )
-
-            NavigateSearchScreen -> navController.navigate(
-                NestedScreen.SearchScreen.fromPopularScreen(
-                    source = "POPULAR"
+                NestedScreen.FilmDetails.fromFavoritesScreen(
+                    filmId = screenAction.kinopoiskId,
+                    source = "FAVORITES"
                 )
             )
 
@@ -185,7 +187,12 @@ private fun PopularScreenActions(
                     duration = SnackbarDuration.Short
                 )
             }
+
+            NavigateSearchScreen -> navController.navigate(
+                NestedScreen.SearchScreen.fromFavoritesScreen(
+                    source = "FAVORITES"
+                )
+            )
         }
     }
 }
-

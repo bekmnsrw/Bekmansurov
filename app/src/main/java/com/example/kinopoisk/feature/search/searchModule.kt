@@ -1,6 +1,8 @@
 package com.example.kinopoisk.feature.search
 
+import androidx.lifecycle.SavedStateHandle
 import com.example.kinopoisk.core.network.KinopoiskApi
+import com.example.kinopoisk.feature.favorites.domain.usecase.SearchFavoriteFilmsUseCase
 import com.example.kinopoisk.feature.search.data.SearchRepositoryImpl
 import com.example.kinopoisk.feature.search.domain.SearchRepository
 import com.example.kinopoisk.feature.search.domain.usecase.SearchFilmUseCase
@@ -14,7 +16,11 @@ val searchModule = module {
     }
 
     viewModel {
-        provideSearchViewModel(searchFilmUseCase = get())
+        provideSearchViewModel(
+            savedStateHandle = get(),
+            searchFilmUseCase = get(),
+            searchFavoriteFilmsUseCase = get()
+        )
     }
 
     factory<SearchFilmUseCase> {
@@ -35,7 +41,11 @@ private fun provideSearchFilmUseCase(
 )
 
 private fun provideSearchViewModel(
-    searchFilmUseCase: SearchFilmUseCase
+    savedStateHandle: SavedStateHandle,
+    searchFilmUseCase: SearchFilmUseCase,
+    searchFavoriteFilmsUseCase: SearchFavoriteFilmsUseCase
 ): SearchViewModel = SearchViewModel(
-    searchFilmUseCase = searchFilmUseCase
+    savedStateHandle = savedStateHandle,
+    searchFilmUseCase = searchFilmUseCase,
+    searchFavoriteFilmsUseCase = searchFavoriteFilmsUseCase
 )

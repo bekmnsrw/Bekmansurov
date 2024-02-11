@@ -1,6 +1,8 @@
 package com.example.kinopoisk.feature.popular
 
 import com.example.kinopoisk.core.network.KinopoiskApi
+import com.example.kinopoisk.feature.favorites.domain.usecase.GetAllFavoriteFilmsUseCase
+import com.example.kinopoisk.feature.favorites.domain.usecase.SaveFavoriteFilmUseCase
 import com.example.kinopoisk.feature.popular.data.PopularRepositoryImpl
 import com.example.kinopoisk.feature.popular.domain.PopularRepository
 import com.example.kinopoisk.feature.popular.domain.usecase.GetTop100FilmsUseCase
@@ -14,7 +16,11 @@ val popularModule = module {
     }
 
     viewModel {
-        providePopularViewModel(getTop100FilmsUseCase = get())
+        providePopularViewModel(
+            getTop100FilmsUseCase = get(),
+            saveFavoriteFilmUseCase = get(),
+            getAllFavoriteFilmsUseCase = get()
+        )
     }
 
     factory<GetTop100FilmsUseCase> {
@@ -23,9 +29,13 @@ val popularModule = module {
 }
 
 private fun providePopularViewModel(
-    getTop100FilmsUseCase: GetTop100FilmsUseCase
+    getTop100FilmsUseCase: GetTop100FilmsUseCase,
+    saveFavoriteFilmUseCase: SaveFavoriteFilmUseCase,
+    getAllFavoriteFilmsUseCase: GetAllFavoriteFilmsUseCase
 ): PopularViewModel = PopularViewModel(
-    getTop100FilmsUseCase = getTop100FilmsUseCase
+    getTop100FilmsUseCase = getTop100FilmsUseCase,
+    saveFavoriteFilmUseCase = saveFavoriteFilmUseCase,
+    getAllFavoriteFilmsUseCase = getAllFavoriteFilmsUseCase
 )
 
 private fun providePopularRepository(

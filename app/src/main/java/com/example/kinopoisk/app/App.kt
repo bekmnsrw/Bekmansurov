@@ -1,8 +1,10 @@
 package com.example.kinopoisk.app
 
 import android.app.Application
+import com.example.kinopoisk.core.database.databaseModule
 import com.example.kinopoisk.core.network.networkModule
 import com.example.kinopoisk.feature.details.detailsModule
+import com.example.kinopoisk.feature.favorites.favoritesModule
 import com.example.kinopoisk.feature.popular.popularModule
 import com.example.kinopoisk.feature.search.searchModule
 import org.koin.android.ext.koin.androidContext
@@ -21,7 +23,9 @@ class App : Application() {
                 networkModule,
                 popularModule,
                 detailsModule,
-                searchModule
+                searchModule,
+                databaseModule,
+                favoritesModule
             )
         }
     }

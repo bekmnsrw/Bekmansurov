@@ -192,9 +192,10 @@ private fun SearchResultList(
             contentType = { "SearchResult" }
         ) { filmBrief ->
             KinopoiskFilmCard(
+                isFavorite = false,
                 filmBrief = filmBrief,
                 onClick = { onClick(filmBrief.filmId) },
-                onLongPress = {}
+                onPress = {}
             )
         }
     }
@@ -211,7 +212,8 @@ private fun SearchScreenActions(
 
             is NavigateDetails -> navController.navigate(
                 NestedScreen.FilmDetails.fromSearchScreen(
-                    filmId = screenAction.filmId
+                    filmId = screenAction.filmId,
+                    source = "SEARCH"
                 )
             )
 

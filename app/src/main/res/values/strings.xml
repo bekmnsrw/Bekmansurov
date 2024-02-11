@@ -8,4 +8,7 @@
     <string name="other_error">Упс! Что-то пошло не так, повторите попытку</string>
     <string name="not_found">Не найдено</string>
     <string name="search">Поиск</string>
+    <string name="no_data_in_db">У вас нет избранных фильмов, добавьте их на главном экране</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 </resources>

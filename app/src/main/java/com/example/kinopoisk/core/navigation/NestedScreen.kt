@@ -8,30 +8,39 @@ sealed class NestedScreen(
 
     private companion object {
         const val FILM_ID = "filmId"
+        const val SOURCE = "source"
     }
 
     data object FilmDetails : NestedScreen(
-        route1 = "$DETAILS_FROM_POPULAR/{$FILM_ID}",
-        route2 = "$DETAILS_FROM_FAVORITES/{$FILM_ID}",
-        route3 = "$DETAILS_FROM_SEARCH/{$FILM_ID}"
+        route1 = "$DETAILS_FROM_POPULAR/{$FILM_ID}/{$SOURCE}",
+        route2 = "$DETAILS_FROM_FAVORITES/{$FILM_ID}/{$SOURCE}",
+        route3 = "$DETAILS_FROM_SEARCH/{$FILM_ID}/{$SOURCE}"
     ) {
 
         fun fromPopularScreen(
-            filmId: Int
-        ): String = "$DETAILS_FROM_POPULAR/$filmId"
+            filmId: Int,
+            source: String
+        ): String = "$DETAILS_FROM_POPULAR/$filmId/$source"
 
         fun fromFavoritesScreen(
-            filmId: Int
-        ): String = "$DETAILS_FROM_FAVORITES/$filmId"
+            filmId: Int,
+            source: String
+        ): String = "$DETAILS_FROM_FAVORITES/$filmId/$source"
 
         fun fromSearchScreen(
-            filmId: Int
-        ): String = "$DETAILS_FROM_SEARCH/$filmId"
+            filmId: Int,
+            source: String
+        ): String = "$DETAILS_FROM_SEARCH/$filmId/$source"
     }
 
     data object SearchScreen : NestedScreen(
-        route1 = SEARCH_FROM_POPULAR,
-        route2 = SEARCH_FROM_FAVORITES,
+        route1 = "$SEARCH_FROM_POPULAR/{$SOURCE}",
+        route2 = "$SEARCH_FROM_FAVORITES/{$SOURCE}",
         route3 = ""
-    )
+    ) {
+
+        fun fromPopularScreen(source: String) = "$SEARCH_FROM_POPULAR/$source"
+
+        fun fromFavoritesScreen(source: String) = "$SEARCH_FROM_FAVORITES/$source"
+    }
 }

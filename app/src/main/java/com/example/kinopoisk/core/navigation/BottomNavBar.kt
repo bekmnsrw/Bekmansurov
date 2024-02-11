@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
 import com.example.kinopoisk.core.widget.KinopoiskButton
 
@@ -49,11 +50,11 @@ fun BottomNavBar(
                             false -> KinopoiskTheme.kinopoiskColor.onSecondary
                         }
                     ) {
-//                    navController.navigate(bottomAppBarItem.route) {
-//                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-//                        launchSingleTop = true
-//                        restoreState = true
-//                    }
+                    navController.navigate(bottomAppBarItem.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                         selectedTab = index
                     }
                 }

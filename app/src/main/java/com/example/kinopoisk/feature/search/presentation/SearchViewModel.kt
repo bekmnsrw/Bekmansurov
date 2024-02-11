@@ -1,8 +1,11 @@
 package com.example.kinopoisk.feature.search.presentation
 
 import androidx.compose.runtime.Immutable
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kinopoisk.core.database.mapper.toFilmBriefList
+import com.example.kinopoisk.feature.favorites.domain.usecase.SearchFavoriteFilmsUseCase
 import com.example.kinopoisk.feature.popular.domain.dto.FilmBrief
 import com.example.kinopoisk.feature.search.data.mapper.toFilmBriefList
 import com.example.kinopoisk.feature.search.domain.usecase.SearchFilmUseCase
@@ -39,8 +42,16 @@ import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 
 class SearchViewModel(
-    private val searchFilmUseCase: SearchFilmUseCase
+    savedStateHandle: SavedStateHandle,
+    private val searchFilmUseCase: SearchFilmUseCase,
+    private val searchFavoriteFilmsUseCase: SearchFavoriteFilmsUseCase
 ) : ViewModel() {
+
+    private companion object {
+        const val SOURCE = "source"
+    }
+
+    private val source: String = checkNotNull(savedStateHandle[SOURCE]).toString()
 
     private val _screenState = MutableStateFlow(SearchScreenState())
     val screenState: StateFlow<SearchScreenState> = _screenState.asStateFlow()
@@ -51,6 +62,81 @@ class SearchViewModel(
     private val _searchInput = MutableStateFlow("")
     val searchInput: StateFlow<String> = _searchInput.asStateFlow()
 
+    private suspend fun searchFromRemoteSource(
+        query: String
+    ): StateFlow<List<FilmBrief>> = searchFilmUseCase(query = query)
+        .flowOn(Dispatchers.IO)
+        .onStart {
+            _screenState.emit(
+                _screenState.value.copy(
+                    isLoading = true,
+                    error = null
+                )
+            )
+        }
+        .onCompletion {
+            _screenState.emit(
+                _screenState.value.copy(
+                    isLoading = false
+                )
+            )
+        }
+        .catch {
+            when (it) {
+                is UnknownHostException -> _screenState.emit(
+                    _screenState.value.copy(
+                        error = ErrorType.UNKNOWN_HOST_EXCEPTION
+                    )
+                )
+
+                else -> _screenState.emit(
+                    _screenState.value.copy(
+                        error = ErrorType.OTHER
+                    )
+                )
+            }
+            println(it)
+        }
+        .map { it.toFilmBriefList() }
+        .onEach {
+            _screenState.emit(
+                _screenState.value.copy(
+                    isSearchSuccessful = it.isNotEmpty()
+                )
+            )
+        }
+        .stateIn(viewModelScope)
+
+    private suspend fun searchFromLocalSource(
+        query: String
+    ): StateFlow<List<FilmBrief>> = searchFavoriteFilmsUseCase(query = query)
+        .flowOn(Dispatchers.IO)
+        .catch {
+            when (it) {
+                is UnknownHostException -> _screenState.emit(
+                    _screenState.value.copy(
+                        error = ErrorType.UNKNOWN_HOST_EXCEPTION
+                    )
+                )
+
+                else -> _screenState.emit(
+                    _screenState.value.copy(
+                        error = ErrorType.OTHER
+                    )
+                )
+            }
+            println(it)
+        }
+        .map { it.toFilmBriefList() }
+        .onEach {
+            _screenState.emit(
+                _screenState.value.copy(
+                    isSearchSuccessful = it.isNotEmpty()
+                )
+            )
+        }
+        .stateIn(viewModelScope)
+
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val searchResult: Flow<List<FilmBrief>> = _searchInput
         .debounce(500)
@@ -58,47 +144,8 @@ class SearchViewModel(
         .flatMapLatest { query ->
             when {
                 query.isEmpty() -> flowOf(persistentListOf())
-                else -> searchFilmUseCase(query = query)
-                    .flowOn(Dispatchers.IO)
-                    .onStart {
-                        _screenState.emit(
-                            _screenState.value.copy(
-                                isLoading = true,
-                                error = null
-                            )
-                        )
-                    }
-                    .onCompletion {
-                        _screenState.emit(
-                            _screenState.value.copy(
-                                isLoading = false
-                            )
-                        )
-                    }
-                    .catch {
-                        when (it) {
-                            is UnknownHostException -> _screenState.emit(
-                                _screenState.value.copy(
-                                    error = ErrorType.NO_INTERNET_CONNECTION
-                                )
-                            )
-                            else -> _screenState.emit(
-                                _screenState.value.copy(
-                                    error = ErrorType.OTHER
-                                )
-                            )
-                        }
-                        println(it)
-                    }
-                    .map { it.toFilmBriefList() }
-                    .onEach {
-                        _screenState.emit(
-                            _screenState.value.copy(
-                                isSearchSuccessful = it.isNotEmpty()
-                            )
-                        )
-                    }
-                    .stateIn(viewModelScope)
+                source == "FAVORITES" -> searchFromLocalSource(query = query)
+                else -> searchFromRemoteSource(query = query)
             }
         }
 

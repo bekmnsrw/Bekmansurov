@@ -6,6 +6,7 @@ import com.example.kinopoisk.feature.details.data.response.GenreResponse
 import com.example.kinopoisk.feature.details.domain.dto.Country
 import com.example.kinopoisk.feature.details.domain.dto.FilmDetails
 import com.example.kinopoisk.feature.details.domain.dto.Genre
+import com.example.kinopoisk.feature.favorites.domain.dto.FavoriteFilm
 
 private const val UNKNOWN = "?"
 private const val NO_DESCRIPTION = "Нет описания"
@@ -24,5 +25,14 @@ fun FilmDetailsResponse.toFilmDetails(): FilmDetails = FilmDetails(
     description = description ?: NO_DESCRIPTION,
     genres = genres.toGenresList().joinToString(", ") { it.genre },
     countries = countries.toCountriesList().joinToString(", ") { it.country },
+    imageUrl = posterUrl
+)
+
+fun FavoriteFilm.toFilmDetails(): FilmDetails = FilmDetails(
+    filmId = kinopoiskId,
+    nameRu = name,
+    description = "",
+    genres = "",
+    countries = "",
     imageUrl = posterUrl
 )

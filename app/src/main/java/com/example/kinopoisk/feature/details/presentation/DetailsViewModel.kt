@@ -4,10 +4,12 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kinopoisk.feature.details.data.mapper.toFilmDetails
 import com.example.kinopoisk.feature.details.domain.dto.FilmDetails
 import com.example.kinopoisk.feature.details.domain.usecase.GetFilmDetailsUseCase
 import com.example.kinopoisk.feature.details.presentation.DetailsViewModel.DetailsScreenAction.*
 import com.example.kinopoisk.feature.details.presentation.DetailsViewModel.DetailsScreenEvent.*
+import com.example.kinopoisk.feature.favorites.domain.usecase.GetFavoriteFilmByIdUseCase
 import com.example.kinopoisk.utils.ErrorType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,14 +27,17 @@ import java.net.UnknownHostException
 
 class DetailsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val getFilmDetailsUseCase: GetFilmDetailsUseCase
+    private val getFilmDetailsUseCase: GetFilmDetailsUseCase,
+    private val getFavoriteFilmByIdUseCase: GetFavoriteFilmByIdUseCase
 ) : ViewModel() {
 
     private companion object {
         const val FILM_ID = "filmId"
+        const val SOURCE = "source"
     }
 
     private val filmId: Int = checkNotNull(savedStateHandle[FILM_ID]).toString().toInt()
+    private val source: String = checkNotNull(savedStateHandle[SOURCE]).toString()
 
     private val _screenState = MutableStateFlow(DetailsScreenState())
     val screenState: StateFlow<DetailsScreenState> = _screenState.asStateFlow()
@@ -71,7 +76,7 @@ class DetailsViewModel(
         }
     }
 
-    private fun onInit() = viewModelScope.launch {
+    private suspend fun getFilmDetailsFromRemoteSource(filmId: Int) = viewModelScope.launch {
         getFilmDetailsUseCase(filmId = filmId)
             .flowOn(Dispatchers.IO)
             .onStart {
@@ -92,7 +97,7 @@ class DetailsViewModel(
                 when (it) {
                     is UnknownHostException -> _screenState.emit(
                         _screenState.value.copy(
-                            error = ErrorType.NO_INTERNET_CONNECTION
+                            error = ErrorType.UNKNOWN_HOST_EXCEPTION
                         )
                     )
                     else -> _screenState.emit(
@@ -111,6 +116,40 @@ class DetailsViewModel(
                     )
                 )
             }
+    }
+
+    private suspend fun getFilmDetailsFromLocalSource(filmId: Int) = viewModelScope.launch {
+        getFavoriteFilmByIdUseCase(kinopoiskId = filmId)
+            .flowOn(Dispatchers.IO)
+            .onStart {
+                _screenState.emit(
+                    _screenState.value.copy(
+                        isLoading = true
+                    )
+                )
+            }
+            .onCompletion {
+                _screenState.emit(
+                    _screenState.value.copy(
+                        isLoading = false
+                    )
+                )
+            }
+            .catch { println(it) }
+            .collect { filmDetails ->
+                _screenState.emit(
+                    _screenState.value.copy(
+                        filmDetails = filmDetails.toFilmDetails()
+                    )
+                )
+            }
+    }
+
+    private fun onInit() = viewModelScope.launch {
+        when (source) {
+            "FAVORITES" -> getFilmDetailsFromLocalSource(filmId = filmId)
+            else -> getFilmDetailsFromRemoteSource(filmId = filmId)
+        }
     }
 
     private fun onArrowBackClick() = viewModelScope.launch {
@@ -141,7 +180,7 @@ class DetailsViewModel(
                 when (it) {
                     is UnknownHostException -> _screenState.emit(
                         _screenState.value.copy(
-                            error = ErrorType.NO_INTERNET_CONNECTION
+                            error = ErrorType.UNKNOWN_HOST_EXCEPTION
                         )
                     )
                     else -> _screenState.emit(

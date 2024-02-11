@@ -3,6 +3,8 @@ package com.example.kinopoisk.feature.popular.presentation
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kinopoisk.feature.favorites.domain.usecase.GetAllFavoriteFilmsUseCase
+import com.example.kinopoisk.feature.favorites.domain.usecase.SaveFavoriteFilmUseCase
 import com.example.kinopoisk.feature.popular.domain.dto.FilmBrief
 import com.example.kinopoisk.feature.popular.domain.usecase.GetTop100FilmsUseCase
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.*
@@ -26,7 +28,9 @@ import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 
 class PopularViewModel(
-    private val getTop100FilmsUseCase: GetTop100FilmsUseCase
+    private val getTop100FilmsUseCase: GetTop100FilmsUseCase,
+    private val saveFavoriteFilmUseCase: SaveFavoriteFilmUseCase,
+    private val getAllFavoriteFilmsUseCase: GetAllFavoriteFilmsUseCase
 ) : ViewModel() {
 
     private val _screenState = MutableStateFlow(PopularScreenState())
@@ -39,7 +43,10 @@ class PopularViewModel(
     data class PopularScreenState(
         val isLoading: Boolean = false,
         val top100Films: PersistentList<FilmBrief> = persistentListOf(),
-        val error: ErrorType? = null
+        val favoriteFilmsIds: PersistentList<Int> = persistentListOf(),
+        val error: ErrorType? = null,
+        val shouldShowDialog: Boolean = false,
+        val selectedFilm: FilmBrief? = null
     )
 
     @Immutable
@@ -48,12 +55,16 @@ class PopularViewModel(
         data class OnFilmCardClick(val filmId: Int) : PopularScreenEvent
         data object OnRetryButtonClick : PopularScreenEvent
         data object OnSearchIconClick : PopularScreenEvent
+        data class OnFilmCardPress(val filmBrief: FilmBrief) : PopularScreenEvent
+        data object OnDialogDismissRequest : PopularScreenEvent
+        data class OnConfirmDialog(val filmBrief: FilmBrief) : PopularScreenEvent
     }
 
     @Immutable
     sealed interface PopularScreenAction {
         data class NavigateDetails(val filmId: Int) : PopularScreenAction
         data object NavigateSearchScreen : PopularScreenAction
+        data class ShowSnackbar(val message: String) : PopularScreenAction
     }
 
     init {
@@ -66,6 +77,9 @@ class PopularViewModel(
             is OnFilmCardClick -> onFilmCardClick(event.filmId)
             OnRetryButtonClick -> onRetryButtonClick()
             OnSearchIconClick -> onSearchIconClick()
+            is OnFilmCardPress -> onFilmCardPress(event.filmBrief)
+            OnDialogDismissRequest -> onDialogDismissRequest()
+            is OnConfirmDialog -> onConfirmDialog(event.filmBrief)
         }
     }
 
@@ -90,7 +104,7 @@ class PopularViewModel(
                 when (it) {
                     is UnknownHostException -> _screenState.emit(
                         _screenState.value.copy(
-                            error = ErrorType.NO_INTERNET_CONNECTION
+                            error = ErrorType.UNKNOWN_HOST_EXCEPTION
                         )
                     )
                     else -> _screenState.emit(
@@ -108,6 +122,21 @@ class PopularViewModel(
                         error = null
                     )
                 )
+            }
+
+        getAllFavoriteFilmsUseCase()
+            .flowOn(Dispatchers.IO)
+            .collect { favoriteFilms ->
+                _screenState.emit(
+                    _screenState.value.copy(
+                        favoriteFilmsIds = favoriteFilms
+                            .map { it.id }
+                            .toPersistentList()
+                    )
+                )
+                favoriteFilms.forEach {
+                    print("${it.id}", )
+                }
             }
     }
 
@@ -139,7 +168,7 @@ class PopularViewModel(
                 when (it) {
                     is UnknownHostException -> _screenState.emit(
                         _screenState.value.copy(
-                            error = ErrorType.NO_INTERNET_CONNECTION
+                            error = ErrorType.UNKNOWN_HOST_EXCEPTION
                         )
                     )
                     else -> _screenState.emit(
@@ -163,6 +192,37 @@ class PopularViewModel(
     private fun onSearchIconClick() = viewModelScope.launch {
         _screenAction.emit(
             NavigateSearchScreen
+        )
+    }
+
+    private fun onFilmCardPress(filmBrief: FilmBrief) = viewModelScope.launch {
+        _screenState.emit(
+            _screenState.value.copy(
+                shouldShowDialog = true,
+                selectedFilm = filmBrief
+            )
+        )
+    }
+
+    private fun onDialogDismissRequest() = viewModelScope.launch {
+        _screenState.emit(
+            _screenState.value.copy(
+                shouldShowDialog = false
+            )
+        )
+    }
+
+    private fun onConfirmDialog(filmBrief: FilmBrief) = viewModelScope.launch {
+        saveFavoriteFilmUseCase(filmBrief = filmBrief)
+        _screenState.emit(
+            _screenState.value.copy(
+                shouldShowDialog = false
+            )
+        )
+        _screenAction.emit(
+            ShowSnackbar(
+                message = "Фильм \"${filmBrief.nameRu}\" добавлен в избранное"
+            )
         )
     }
 }

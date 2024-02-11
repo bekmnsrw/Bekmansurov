@@ -6,6 +6,8 @@ import com.example.kinopoisk.feature.details.data.DetailsRepositoryImpl
 import com.example.kinopoisk.feature.details.domain.DetailsRepository
 import com.example.kinopoisk.feature.details.domain.usecase.GetFilmDetailsUseCase
 import com.example.kinopoisk.feature.details.presentation.DetailsViewModel
+import com.example.kinopoisk.feature.favorites.domain.usecase.GetFavoriteFilmByIdUseCase
+import org.koin.androidx.compose.get
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -17,7 +19,8 @@ val detailsModule = module {
     viewModel {
         provideDetailsViewModel(
             savedStateHandle = get(),
-            getFilmDetailsUseCase = get()
+            getFilmDetailsUseCase = get(),
+            getFavoriteFilmByIdUseCase = get()
         )
     }
 
@@ -40,8 +43,10 @@ private fun provideGetFilmDetailsUseCase(
 
 private fun provideDetailsViewModel(
     savedStateHandle: SavedStateHandle,
-    getFilmDetailsUseCase: GetFilmDetailsUseCase
+    getFilmDetailsUseCase: GetFilmDetailsUseCase,
+    getFavoriteFilmByIdUseCase: GetFavoriteFilmByIdUseCase
 ): DetailsViewModel = DetailsViewModel(
     savedStateHandle = savedStateHandle,
-    getFilmDetailsUseCase = getFilmDetailsUseCase
+    getFilmDetailsUseCase = getFilmDetailsUseCase,
+    getFavoriteFilmByIdUseCase = getFavoriteFilmByIdUseCase
 )

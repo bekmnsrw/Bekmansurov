@@ -9,6 +9,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
 import com.example.kinopoisk.core.navigation.navgraph.NavigationGraph
+import com.example.kinopoisk.core.navigation.navgraph.favoritesNavGraph
 import com.example.kinopoisk.core.navigation.navgraph.popularNavGraph
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -43,6 +44,7 @@ fun NavigationHost(navController: NavHostController = rememberNavController()) {
             startDestination = NavigationGraph.PopularNavGraph.route
         ) {
             popularNavGraph(navController = navController)
+            favoritesNavGraph(navController = navController)
         }
     }
 }
