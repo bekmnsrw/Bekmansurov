@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
 
 @Composable
-fun KinopoiskCircularBar(
+fun KinopoiskProgressBar(
     modifier: Modifier = Modifier,
     shouldShow: Boolean
 ) {

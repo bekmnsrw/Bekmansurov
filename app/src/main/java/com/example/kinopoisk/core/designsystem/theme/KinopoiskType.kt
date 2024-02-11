@@ -19,7 +19,8 @@ data class KinopoiskTypography(
     val filmTitle: TextStyle,
     val filmDescriptionKey: TextStyle,
     val filmDescriptionValue: TextStyle,
-    val errorText: TextStyle
+    val errorText: TextStyle,
+    val searchPlaceholder: TextStyle
 )
 
 @Composable
@@ -62,6 +63,11 @@ fun provideKinopoiskTypography(): KinopoiskTypography = KinopoiskTypography(
     errorText = TextStyle(
         fontWeight = FontWeight.W400,
         fontSize = TextUnit(value = 14F, type = TextUnitType.Sp),
+        lineHeight = TextUnit(value = 16F, type = TextUnitType.Sp)
+    ),
+    searchPlaceholder = TextStyle(
+        fontWeight = FontWeight.W400,
+        fontSize = TextUnit(value = 20F, type = TextUnitType.Sp),
         lineHeight = TextUnit(value = 16F, type = TextUnitType.Sp)
     )
 )

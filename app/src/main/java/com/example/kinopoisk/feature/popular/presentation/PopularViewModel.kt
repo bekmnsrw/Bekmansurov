@@ -47,11 +47,13 @@ class PopularViewModel(
         data object OnInit : PopularScreenEvent
         data class OnFilmCardClick(val filmId: Int) : PopularScreenEvent
         data object OnRetryButtonClick : PopularScreenEvent
+        data object OnSearchIconClick : PopularScreenEvent
     }
 
     @Immutable
     sealed interface PopularScreenAction {
         data class NavigateDetails(val filmId: Int) : PopularScreenAction
+        data object NavigateSearchScreen : PopularScreenAction
     }
 
     init {
@@ -63,6 +65,7 @@ class PopularViewModel(
             OnInit -> onInit()
             is OnFilmCardClick -> onFilmCardClick(event.filmId)
             OnRetryButtonClick -> onRetryButtonClick()
+            OnSearchIconClick -> onSearchIconClick()
         }
     }
 
@@ -155,5 +158,11 @@ class PopularViewModel(
                     )
                 )
             }
+    }
+
+    private fun onSearchIconClick() = viewModelScope.launch {
+        _screenAction.emit(
+            NavigateSearchScreen
+        )
     }
 }

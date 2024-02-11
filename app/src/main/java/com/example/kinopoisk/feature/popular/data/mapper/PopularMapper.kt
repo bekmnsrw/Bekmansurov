@@ -7,7 +7,7 @@ fun FilmBriefResponse.toFilmBrief(): FilmBrief = FilmBrief(
     filmId = filmId,
     nameRu = nameRu,
     posterUrlPreview = posterUrlPreview,
-    year = year,
+    year = year.toString(),
     genre = genres.first().genre.replaceFirstChar { it.uppercase() }
 )
 

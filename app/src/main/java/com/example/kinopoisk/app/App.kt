@@ -4,6 +4,7 @@ import android.app.Application
 import com.example.kinopoisk.core.network.networkModule
 import com.example.kinopoisk.feature.details.detailsModule
 import com.example.kinopoisk.feature.popular.popularModule
+import com.example.kinopoisk.feature.search.searchModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -19,7 +20,8 @@ class App : Application() {
             modules(
                 networkModule,
                 popularModule,
-                detailsModule
+                detailsModule,
+                searchModule
             )
         }
     }

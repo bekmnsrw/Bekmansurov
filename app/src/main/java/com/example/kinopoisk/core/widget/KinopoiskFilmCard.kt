@@ -78,7 +78,7 @@ private fun KinopoiskCardTitle(text: String) {
 @Composable
 private fun KinopoiskCardSupportingText(
     genre: String,
-    year: Int
+    year: String
 ) {
     Text(
         text = "$genre ($year)",

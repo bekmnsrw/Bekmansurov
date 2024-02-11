@@ -25,7 +25,7 @@ import androidx.navigation.NavController
 import com.example.kinopoisk.R
 import com.example.kinopoisk.core.designsystem.icon.KinopoiskIcons
 import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
-import com.example.kinopoisk.core.widget.KinopoiskCircularBar
+import com.example.kinopoisk.core.widget.KinopoiskProgressBar
 import com.example.kinopoisk.core.widget.KinopoiskErrorMessage
 import com.example.kinopoisk.core.widget.KinopoiskIconButton
 import com.example.kinopoisk.core.widget.KinopoiskImage
@@ -62,7 +62,7 @@ private fun DetailsScreenContent(
 ) {
     Scaffold { contentPadding ->
         when (screenState.isLoading) {
-            true -> KinopoiskCircularBar(shouldShow = true)
+            true -> KinopoiskProgressBar(shouldShow = true)
             false -> {
                 FilmDetails(
                     contentPadding = contentPadding,

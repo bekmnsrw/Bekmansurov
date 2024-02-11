@@ -3,6 +3,7 @@ package com.example.kinopoisk.core.network
 import com.example.kinopoisk.core.network.Qualifier.API_KEY_INTERCEPTOR
 import com.example.kinopoisk.core.network.Qualifier.LOGGING_INTERCEPTOR
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -72,7 +73,11 @@ private fun provideLoggingInterceptor(): Interceptor = HttpLoggingInterceptor().
     level = HttpLoggingInterceptor.Level.BODY
 }
 
-private val json = Json { ignoreUnknownKeys = true }
+@OptIn(ExperimentalSerializationApi::class)
+private val json = Json {
+    ignoreUnknownKeys = true
+    explicitNulls = false
+}
 
 private fun provideConverterFactory(): Converter.Factory = json.asConverterFactory(
     contentType = CONTENT_TYPE.toMediaType()

@@ -2,6 +2,7 @@ package com.example.kinopoisk.core.network
 
 import com.example.kinopoisk.feature.details.data.response.FilmDetailsResponse
 import com.example.kinopoisk.feature.popular.data.response.Top100FilmsResponse
+import com.example.kinopoisk.feature.search.data.response.SearchResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -21,4 +22,9 @@ interface KinopoiskApi {
     suspend fun getFilmDetails(
         @Path(value = "film-id") filmId: Int
     ): FilmDetailsResponse
+
+    @GET(value = "v2.1/films/search-by-keyword")
+    suspend fun searchFilm(
+        @Query(value = "keyword") query: String
+    ): SearchResponse
 }

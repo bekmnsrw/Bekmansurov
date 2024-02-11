@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FilmDetailsResponse(
     @SerialName("kinopoiskId") val kinopoiskId: Int,
-    @SerialName("nameRu") val nameRu: String,
-    @SerialName("description") val description: String,
+    @SerialName("nameRu") val nameRu: String?,
+    @SerialName("description") val description: String?,
     @SerialName("genres") val genres: List<GenreResponse>,
     @SerialName("countries") val countries: List<CountryResponse>,
     @SerialName("posterUrl") val posterUrl: String,

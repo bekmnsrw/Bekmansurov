@@ -21,15 +21,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
-import com.example.kinopoisk.core.navigation.NestedScreen.FilmDetails
+import com.example.kinopoisk.core.navigation.NestedScreen
 import com.example.kinopoisk.core.navigation.navgraph.NavigationGraph
-import com.example.kinopoisk.core.widget.KinopoiskCircularBar
+import com.example.kinopoisk.core.widget.KinopoiskProgressBar
 import com.example.kinopoisk.core.widget.KinopoiskErrorMessage
 import com.example.kinopoisk.core.widget.KinopoiskFilmCard
 import com.example.kinopoisk.core.widget.KinopoiskTopBar
 import com.example.kinopoisk.feature.popular.domain.dto.FilmBrief
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.NavigateDetails
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.*
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.*
 import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenState
@@ -70,14 +70,13 @@ private fun PopularScreenContent(
         topBar = {
             KinopoiskTopBar(
                 scrollBehavior = scrollBehavior,
-                title = NavigationGraph.PopularNavGraph.name
-            ) {
-                // On Search Icon Click
-            }
+                title = NavigationGraph.PopularNavGraph.name,
+                onClick = { eventHandler(OnSearchIconClick) }
+            )
         }
     ) { contentPadding ->
         when (screenState.isLoading) {
-            true -> KinopoiskCircularBar(shouldShow = true)
+            true -> KinopoiskProgressBar(shouldShow = true)
             false -> Top100FilmsList(
                 contentPadding = contentPadding,
                 top100Films = screenState.top100Films,
@@ -131,9 +130,13 @@ private fun PopularScreenActions(
             null -> Unit
 
             is NavigateDetails -> navController.navigate(
-                FilmDetails.fromPopularScreen(
+                NestedScreen.FilmDetails.fromPopularScreen(
                     filmId = screenAction.filmId
                 )
+            )
+
+            NavigateSearchScreen -> navController.navigate(
+                NestedScreen.SearchScreen.route1
             )
         }
     }
