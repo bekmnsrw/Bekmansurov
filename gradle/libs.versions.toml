@@ -30,6 +30,9 @@ ksp = "1.9.0-1.0.13"
 
 detekt = "1.23.3"
 
+junitKotlin = "1.8.10"
+mockk = "1.12.4"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -74,6 +77,10 @@ retrofit-kotlin-serialization = { group = "com.jakewharton.retrofit", name = "re
 room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ksp = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+junit-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "junitKotlin" }
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
