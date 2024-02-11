@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
+import com.example.kinopoisk.core.navigation.NavigationSource
 import com.example.kinopoisk.core.navigation.NestedScreen
 import com.example.kinopoisk.core.navigation.navgraph.NavigationGraph
 import com.example.kinopoisk.core.widget.KinopoiskConfirmDialog
@@ -169,13 +170,13 @@ private fun PopularScreenActions(
             is NavigateDetails -> navController.navigate(
                 NestedScreen.FilmDetails.fromPopularScreen(
                     filmId = screenAction.filmId,
-                    source = "POPULAR"
+                    source = NavigationSource.POPULAR.source
                 )
             )
 
             NavigateSearchScreen -> navController.navigate(
                 NestedScreen.SearchScreen.fromPopularScreen(
-                    source = "POPULAR"
+                    source = NavigationSource.POPULAR.source
                 )
             )
 

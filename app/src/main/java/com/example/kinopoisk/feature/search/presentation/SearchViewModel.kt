@@ -5,6 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kinopoisk.core.database.mapper.toFilmBriefList
+import com.example.kinopoisk.core.navigation.NavArgs
+import com.example.kinopoisk.core.navigation.NavigationSource
 import com.example.kinopoisk.feature.favorites.domain.usecase.SearchFavoriteFilmsUseCase
 import com.example.kinopoisk.feature.popular.domain.dto.FilmBrief
 import com.example.kinopoisk.feature.search.data.mapper.toFilmBriefList
@@ -47,11 +49,7 @@ class SearchViewModel(
     private val searchFavoriteFilmsUseCase: SearchFavoriteFilmsUseCase
 ) : ViewModel() {
 
-    private companion object {
-        const val SOURCE = "source"
-    }
-
-    private val source: String = checkNotNull(savedStateHandle[SOURCE]).toString()
+    private val source: String = checkNotNull(savedStateHandle[NavArgs.SOURCE.value]).toString()
 
     private val _screenState = MutableStateFlow(SearchScreenState())
     val screenState: StateFlow<SearchScreenState> = _screenState.asStateFlow()
@@ -144,7 +142,7 @@ class SearchViewModel(
         .flatMapLatest { query ->
             when {
                 query.isEmpty() -> flowOf(persistentListOf())
-                source == "FAVORITES" -> searchFromLocalSource(query = query)
+                source == NavigationSource.FAVORITES.source -> searchFromLocalSource(query = query)
                 else -> searchFromRemoteSource(query = query)
             }
         }

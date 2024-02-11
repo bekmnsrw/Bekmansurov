@@ -25,8 +25,8 @@ fun NavigationHost(navController: NavHostController = rememberNavController()) {
         FAVORITES_SCREEN_ROUTE
     )
 
-    val showBottomBar =
-        navController.currentBackStackEntryAsState().value?.destination?.route in screensToShowBottomAppBar
+    val showBottomBar = navController
+        .currentBackStackEntryAsState().value?.destination?.route in screensToShowBottomAppBar
 
     Scaffold(
         bottomBar = {

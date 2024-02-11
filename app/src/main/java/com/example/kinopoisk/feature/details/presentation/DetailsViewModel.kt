@@ -4,6 +4,8 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kinopoisk.core.navigation.NavArgs
+import com.example.kinopoisk.core.navigation.NavigationSource
 import com.example.kinopoisk.feature.details.data.mapper.toFilmDetails
 import com.example.kinopoisk.feature.details.domain.dto.FilmDetails
 import com.example.kinopoisk.feature.details.domain.usecase.GetFilmDetailsUseCase
@@ -31,13 +33,8 @@ class DetailsViewModel(
     private val getFavoriteFilmByIdUseCase: GetFavoriteFilmByIdUseCase
 ) : ViewModel() {
 
-    private companion object {
-        const val FILM_ID = "filmId"
-        const val SOURCE = "source"
-    }
-
-    private val filmId: Int = checkNotNull(savedStateHandle[FILM_ID]).toString().toInt()
-    private val source: String = checkNotNull(savedStateHandle[SOURCE]).toString()
+    private val filmId: Int = checkNotNull(savedStateHandle[NavArgs.FILM_ID.value]).toString().toInt()
+    private val source: String = checkNotNull(savedStateHandle[NavArgs.SOURCE.value]).toString()
 
     private val _screenState = MutableStateFlow(DetailsScreenState())
     val screenState: StateFlow<DetailsScreenState> = _screenState.asStateFlow()
@@ -121,20 +118,6 @@ class DetailsViewModel(
     private suspend fun getFilmDetailsFromLocalSource(filmId: Int) = viewModelScope.launch {
         getFavoriteFilmByIdUseCase(kinopoiskId = filmId)
             .flowOn(Dispatchers.IO)
-            .onStart {
-                _screenState.emit(
-                    _screenState.value.copy(
-                        isLoading = true
-                    )
-                )
-            }
-            .onCompletion {
-                _screenState.emit(
-                    _screenState.value.copy(
-                        isLoading = false
-                    )
-                )
-            }
             .catch { println(it) }
             .collect { filmDetails ->
                 _screenState.emit(
@@ -147,7 +130,7 @@ class DetailsViewModel(
 
     private fun onInit() = viewModelScope.launch {
         when (source) {
-            "FAVORITES" -> getFilmDetailsFromLocalSource(filmId = filmId)
+            NavigationSource.FAVORITES.source -> getFilmDetailsFromLocalSource(filmId = filmId)
             else -> getFilmDetailsFromRemoteSource(filmId = filmId)
         }
     }

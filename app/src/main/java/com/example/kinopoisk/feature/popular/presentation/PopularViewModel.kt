@@ -3,12 +3,19 @@ package com.example.kinopoisk.feature.popular.presentation
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kinopoisk.feature.favorites.domain.usecase.GetAllFavoriteFilmsUseCase
 import com.example.kinopoisk.feature.favorites.domain.usecase.SaveFavoriteFilmUseCase
 import com.example.kinopoisk.feature.popular.domain.dto.FilmBrief
 import com.example.kinopoisk.feature.popular.domain.usecase.GetTop100FilmsUseCase
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.*
-import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.*
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.NavigateDetails
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.NavigateSearchScreen
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenAction.ShowSnackbar
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnConfirmDialog
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnDialogDismissRequest
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnFilmCardClick
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnFilmCardPress
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnInit
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnRetryButtonClick
+import com.example.kinopoisk.feature.popular.presentation.PopularViewModel.PopularScreenEvent.OnSearchIconClick
 import com.example.kinopoisk.utils.ErrorType
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
@@ -29,8 +36,7 @@ import java.net.UnknownHostException
 
 class PopularViewModel(
     private val getTop100FilmsUseCase: GetTop100FilmsUseCase,
-    private val saveFavoriteFilmUseCase: SaveFavoriteFilmUseCase,
-    private val getAllFavoriteFilmsUseCase: GetAllFavoriteFilmsUseCase
+    private val saveFavoriteFilmUseCase: SaveFavoriteFilmUseCase
 ) : ViewModel() {
 
     private val _screenState = MutableStateFlow(PopularScreenState())
@@ -123,21 +129,6 @@ class PopularViewModel(
                     )
                 )
             }
-
-        getAllFavoriteFilmsUseCase()
-            .flowOn(Dispatchers.IO)
-            .collect { favoriteFilms ->
-                _screenState.emit(
-                    _screenState.value.copy(
-                        favoriteFilmsIds = favoriteFilms
-                            .map { it.id }
-                            .toPersistentList()
-                    )
-                )
-                favoriteFilms.forEach {
-                    print("${it.id}", )
-                }
-            }
     }
 
     private fun onFilmCardClick(filmId: Int) = viewModelScope.launch {
@@ -214,11 +205,13 @@ class PopularViewModel(
 
     private fun onConfirmDialog(filmBrief: FilmBrief) = viewModelScope.launch {
         saveFavoriteFilmUseCase(filmBrief = filmBrief)
+
         _screenState.emit(
             _screenState.value.copy(
                 shouldShowDialog = false
             )
         )
+
         _screenAction.emit(
             ShowSnackbar(
                 message = "Фильм \"${filmBrief.nameRu}\" добавлен в избранное"

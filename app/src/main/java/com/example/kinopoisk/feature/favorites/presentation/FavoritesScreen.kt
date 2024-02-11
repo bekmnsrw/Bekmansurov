@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
+import com.example.kinopoisk.core.navigation.NavigationSource
 import com.example.kinopoisk.core.navigation.NestedScreen
 import com.example.kinopoisk.core.navigation.navgraph.NavigationGraph
 import com.example.kinopoisk.core.widget.KinopoiskConfirmDialog
@@ -177,7 +178,7 @@ private fun FavoritesScreenActions(
             is NavigateDetails -> navController.navigate(
                 NestedScreen.FilmDetails.fromFavoritesScreen(
                     filmId = screenAction.kinopoiskId,
-                    source = "FAVORITES"
+                    source = NavigationSource.FAVORITES.source
                 )
             )
 
@@ -190,7 +191,7 @@ private fun FavoritesScreenActions(
 
             NavigateSearchScreen -> navController.navigate(
                 NestedScreen.SearchScreen.fromFavoritesScreen(
-                    source = "FAVORITES"
+                    source = NavigationSource.FAVORITES.source
                 )
             )
         }

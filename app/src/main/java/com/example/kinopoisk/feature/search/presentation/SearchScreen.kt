@@ -28,6 +28,7 @@ import androidx.navigation.NavController
 import com.example.kinopoisk.R
 import com.example.kinopoisk.core.designsystem.icon.KinopoiskIcons
 import com.example.kinopoisk.core.designsystem.theme.KinopoiskTheme
+import com.example.kinopoisk.core.navigation.NavigationSource
 import com.example.kinopoisk.core.navigation.NestedScreen
 import com.example.kinopoisk.core.widget.KinopoiskButton
 import com.example.kinopoisk.core.widget.KinopoiskProgressBar
@@ -213,7 +214,7 @@ private fun SearchScreenActions(
             is NavigateDetails -> navController.navigate(
                 NestedScreen.FilmDetails.fromSearchScreen(
                     filmId = screenAction.filmId,
-                    source = "SEARCH"
+                    source = NavigationSource.SEARCH.source
                 )
             )
 
